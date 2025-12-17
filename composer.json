@@ -1,0 +1,12 @@
+{
+    "name": "user/personal-productivity-app",
+    "autoload": {
+        "psr-4": {
+            "User\\PersonalProductivityApp\\": "src/"
+        }
+    },
+    "require": {
+        "phpmailer/phpmailer": "^7.0",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
