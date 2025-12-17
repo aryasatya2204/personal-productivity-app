@@ -4,6 +4,11 @@ session_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/database.php';
 
+use Dotenv\Dotenv;
+
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->safeLoad();
+
 date_default_timezone_set('Asia/Jakarta');
 
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -35,9 +40,13 @@ function base_url($uri = '')
 switch ($path) {
     case '/':
     case '/index.php':
-        require_once __DIR__ . '/../app/controllers/HomeController.php';
-        $controller = new HomeController();
-        $controller->index();
+        if (isset($_SESSION['user_id'])) {
+            require_once __DIR__ . '/../app/controllers/HomeController.php';
+            $controller = new HomeController();
+            $controller->index();
+        } else {
+            require_once __DIR__ . '/../app/views/landing.php';
+        }
         break;
 
     case '/login':
@@ -52,10 +61,40 @@ switch ($path) {
         $controller->logout();
         break;
 
+    case '/auth/verify':
+        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->verify();
+        break;
+
+    case '/auth/forgot-password': 
+        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->forgotPassword();
+        break;
+
+    case '/auth/reset': 
+        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->reset();
+        break;
+
     case '/register':
         require_once __DIR__ . '/../app/controllers/AuthController.php';
         $controller = new AuthController();
         $controller->register();
+        break;
+
+    case '/auth/google':
+        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->google();
+        break;
+
+    case '/auth/google/callback':
+        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        $controller = new AuthController();
+        $controller->googleCallback();
         break;
 
     case '/todos':
