@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../models/Note.php';
-require_once __DIR__ . '/../models/Folder.php';
+require_once __DIR__ . '/../mMdels/Note.php';
+require_once __DIR__ . '/../Models/Folder.php';
 
 class NoteController {
     

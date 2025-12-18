@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../Models/User.php';
 
 class ProfileController {
     
@@ -71,26 +71,43 @@ class ProfileController {
 
     // Ganti Password
     public function changePassword() {
-        $this->ensureLogin();
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $current = $_POST['current_password'];
-            $new = $_POST['new_password'];
-            $confirm = $_POST['confirm_password'];
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $userModel = new User();
+        $user = $userModel->findUserById($_SESSION['user_id']);
+        
+        $old_password = $_POST['old_password'];
+        $new_password = $_POST['new_password'];
+        $confirm_password = $_POST['confirm_password'];
 
-            $userModel = new User();
-            $user = $userModel->findUserById($_SESSION['user_id']);
-
-            if (password_verify($current, $user['password'])) {
-                if ($new === $confirm && strlen($new) >= 6) {
-                    $hash = password_hash($new, PASSWORD_DEFAULT);
-                    $userModel->updatePassword($_SESSION['user_id'], $hash);
-                    header('Location: ' . base_url('profile?msg=password_updated'));
-                    exit;
-                }
-            }
+        // 1. Verifikasi Password Lama
+        if (!password_verify($old_password, $user['password'])) {
+            // Jika password salah, arahkan kembali dengan pesan khusus
+            $_SESSION['swal_error'] = [
+                'title' => 'Password Salah',
+                'html' => 'Password lama tidak sesuai. <br><br> <a href="'.base_url('auth/forgot-password').'" class="text-blue-600 font-bold underline">Lupa password? Klik di sini untuk reset via email.</a>'
+            ];
+            header('Location: ' . base_url('profile'));
+            exit;
         }
-        header('Location: ' . base_url('profile?msg=password_error'));
+
+        // 2. Validasi Password Baru & Konfirmasi
+        if ($new_password !== $confirm_password) {
+            $_SESSION['swal_error'] = ['title' => 'Gagal', 'text' => 'Konfirmasi password baru tidak cocok.'];
+            header('Location: ' . base_url('profile'));
+            exit;
+        }
+
+        // 3. Update Password
+        $hashedPassword = password_hash($new_password, PASSWORD_DEFAULT);
+        if ($userModel->updatePassword($_SESSION['user_id'], $hashedPassword)) {
+            $_SESSION['swal_success'] = 'Password berhasil diperbarui!';
+        }
+        
+        header('Location: ' . base_url('profile'));
+        exit;
     }
+
+}
 
     private function view($view, $data = []) {
         require_once __DIR__ . '/../views/' . $view . '.php';

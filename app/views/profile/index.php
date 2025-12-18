@@ -15,21 +15,40 @@
         
         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 text-center h-fit">
             <div class="relative w-32 h-32 mx-auto mb-4 group">
-                <?php 
-                    $avatar = $data['user']['avatar'] 
-                        ? base_url('uploads/' . $data['user']['avatar']) 
-                        : 'https://ui-avatars.com/api/?name=' . urlencode($data['user']['name']) . '&background=random';
-                ?>
-                <img src="<?= $avatar ?>" class="w-32 h-32 rounded-full object-cover border-4 border-blue-50 shadow-md">
-                
-                <form action="<?= base_url('profile/avatar') ?>" method="POST" enctype="multipart/form-data" class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition cursor-pointer">
-                    <label class="cursor-pointer text-white text-xs font-bold flex flex-col items-center">
-                        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        Ubah Foto
-                        <input type="file" name="avatar" class="hidden" onchange="this.form.submit()">
-                    </label>
-                </form>
-            </div>
+    <div class="w-full h-full rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-3xl shadow-lg ring-4 ring-white overflow-hidden">
+        <?php 
+        $avatar = $_SESSION['user_avatar'] ?? '';
+        $showInitial = true;
+        $avatarUrl = '';
+
+        if (!empty($avatar)) {
+            if (filter_var($avatar, FILTER_VALIDATE_URL)) {
+                $avatarUrl = $avatar;
+                $showInitial = false;
+            } else if (file_exists('assets/uploads/avatars/' . $avatar)) {
+                $avatarUrl = base_url('assets/uploads/avatars/' . $avatar);
+                $showInitial = false;
+            }
+        }
+        ?>
+
+        <?php if (!$showInitial): ?>
+            <img src="<?= $avatarUrl ?>" alt="Avatar" class="w-full h-full object-cover">
+        <?php else: ?>
+            <?php 
+                $name = $_SESSION['user_name'] ?? 'User';
+                $words = explode(" ", $name);
+                $initials = (count($words) >= 2) 
+                            ? strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1)) 
+                            : strtoupper(substr($name, 0, 2));
+                echo htmlspecialchars($initials);
+            ?>
+        <?php endif; ?>
+    </div>
+    <label for="avatarInput" class="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-md border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+    </label>
+</div>
             
             <h3 class="font-bold text-gray-800 text-lg"><?= htmlspecialchars($data['user']['name']) ?></h3>
             <p class="text-sm text-gray-500 mb-4"><?= htmlspecialchars($data['user']['email']) ?></p>
@@ -65,27 +84,26 @@
 
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <h3 class="font-bold text-gray-800 mb-4 border-b pb-2">Ganti Password</h3>
-                <form action="<?= base_url('profile/password') ?>" method="POST">
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Password Saat Ini</label>
-                            <input type="password" name="current_password" required class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
-                                <input type="password" name="new_password" required class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
-                                <input type="password" name="confirm_password" required class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-4 text-right">
-                        <button type="submit" class="bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-gray-900 transition">Update Password</button>
-                    </div>
-                </form>
+                <form action="<?= base_url('profile/password') ?>" method="POST" class="space-y-4">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Password Saat Ini</label>
+        <input type="password" name="old_password" required class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition">
+    </div>
+    
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
+        <input type="password" name="new_password" required class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition">
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru</label>
+        <input type="password" name="confirm_password" required class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition">
+    </div>
+
+    <button type="submit" class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition">
+        Simpan Perubahan Password
+    </button>
+</form>
             </div>
 
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -146,5 +164,16 @@
 
     initTheme();
 </script>
+
+<?php if (isset($_SESSION['swal_error'])): ?>
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: '<?= $_SESSION['swal_error']['title'] ?>',
+        html: '<?= $_SESSION['swal_error']['html'] ?>',
+        confirmButtonColor: '#2563EB'
+    });
+</script>
+<?php unset($_SESSION['swal_error']); endif; ?>
 
 <?php require_once __DIR__ . '/../layouts/footer.php'; ?>

@@ -34,12 +34,42 @@
                 </div>
             
             <div class="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white group-hover:ring-blue-100 transition overflow-hidden relative">
-                <?php if (!empty($_SESSION['user_avatar'])): ?>
-                    <img src="<?= base_url('uploads/' . $_SESSION['user_avatar']) ?>" alt="Avatar" class="w-full h-full object-cover">
-                <?php else: ?>
-                    <?= substr($_SESSION['user_name'] ?? 'U', 0, 1) ?>
-                <?php endif; ?>
-            </div>
+    <?php 
+    $avatar = $_SESSION['user_avatar'] ?? '';
+    $showInitial = true;
+    $avatarUrl = '';
+
+    if (!empty($avatar)) {
+        // 1. Cek jika avatar adalah URL (Login Google)
+        if (filter_var($avatar, FILTER_VALIDATE_URL)) {
+            $avatarUrl = $avatar;
+            $showInitial = false;
+        } 
+        // 2. Cek jika avatar adalah file lokal yang ada di folder uploads
+        else if (file_exists('assets/uploads/avatars/' . $avatar)) {
+            $avatarUrl = base_url('assets/uploads/avatars/' . $avatar);
+            $showInitial = false;
+        }
+    }
+    ?>
+
+    <?php if (!$showInitial): ?>
+        <img src="<?= $avatarUrl ?>" alt="Avatar" class="w-full h-full object-cover">
+    <?php else: ?>
+        <?php 
+            // Ambil Inisial (Contoh: "Budi Santoso" -> "BS")
+            $name = $_SESSION['user_name'] ?? 'User';
+            $words = explode(" ", $name);
+            $initials = "";
+            if (count($words) >= 2) {
+                $initials = strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+            } else {
+                $initials = strtoupper(substr($name, 0, 2));
+            }
+            echo htmlspecialchars($initials);
+        ?>
+    <?php endif; ?>
+</div>
         </a>
     </header>
 

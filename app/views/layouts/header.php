@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($data['title']) ? $data['title'] . ' - ' : '' ?>Productivity App</title>
     <link href="assets/css/output.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/favicon.png') ?>">
+    <link rel="apple-touch-icon" href="<?= base_url('assets/img/favicon.png') ?>">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
@@ -17,6 +19,29 @@
     </script>
 
     <style>
+    /* Custom SweetAlert Styling */
+    .swal2-popup.modern-alert {
+        border-radius: 20px !important;
+        padding: 2rem !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1) !important;
+    }
+    .swal2-title.modern-title {
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        color: #1f2937 !important;
+    }
+    .swal2-html-container.modern-text {
+        color: #4b5563 !important;
+        font-size: 1rem !important;
+        line-height: 1.5 !important;
+    }
+    .modern-confirm-btn {
+        padding: 0.8rem 2rem !important;
+        font-weight: 600 !important;
+        border-radius: 12px !important;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }

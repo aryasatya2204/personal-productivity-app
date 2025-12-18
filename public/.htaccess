@@ -2,10 +2,10 @@
     RewriteEngine On
     RewriteBase /
     
-    # Jika yang diminta bukan file fisik atau folder fisik
+    # Izinkan akses file fisik (gambar, css, js)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     
-    # Arahkan ke index.php
+    # Redirect sisanya ke index.php
     RewriteRule ^(.*)$ index.php [L,QSA]
 </IfModule>

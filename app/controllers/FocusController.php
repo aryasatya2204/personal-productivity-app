@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/Focus.php';
+require_once __DIR__ . '/../Models/Focus.php';
 
 class FocusController {
     

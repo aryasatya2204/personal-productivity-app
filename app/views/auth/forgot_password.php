@@ -5,8 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lupa Password - Productivity App</title>
     <link href="<?= base_url('assets/css/output.css') ?>" rel="stylesheet">
-    <!-- LOAD SWEETALERT DI HEAD -->
+    <link href="<?= base_url('assets/css/output.css') ?>" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/favicon.png') ?>">
+    <link rel="apple-touch-icon" href="<?= base_url('assets/img/favicon.png') ?>">
+    
+    <style>
+        .swal2-container {
+            z-index: 99999 !important;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans antialiased text-gray-900">
 
@@ -124,42 +132,30 @@
     <!-- POPUP ERROR -->
     <?php if (!empty($data['error'])): ?>
     <script>
-    (function() {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', showError);
-        } else {
-            showError();
-        }
-
-        function showError() {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal Mengirim Email',
-                    text: '<?= addslashes($data['error']) ?>',
-                    confirmButtonText: 'Coba Lagi',
-                    confirmButtonColor: '#ef4444',
-                    customClass: {
-                        popup: 'shake-popup'
-                    }
-                });
-            }
-        }
-    })();
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: '<?= htmlspecialchars($data['error']) ?>',
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Coba Lagi'
+            });
+        });
     </script>
-
-    <style>
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-        20%, 40%, 60%, 80% { transform: translateX(10px); }
-    }
-
-    .shake-popup {
-        animation: shake 0.5s ease-out !important;
-    }
-    </style>
     <?php endif; ?>
 
+    <?php if (!empty($data['success'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Email Terkirim!',
+                text: '<?= htmlspecialchars($data['success']) ?>',
+                confirmButtonColor: '#2563EB',
+                confirmButtonText: 'Cek Email Saya'
+            });
+        });
+    </script>
+    <?php endif; ?>
 </body>
 </html>

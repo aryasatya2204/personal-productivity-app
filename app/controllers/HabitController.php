@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../models/Habit.php';
-require_once __DIR__ . '/../models/ActivityLogger.php';
+require_once __DIR__ . '/../Models/Habit.php';
+require_once __DIR__ . '/../Models/ActivityLogger.php';
 
 class HabitController {
     

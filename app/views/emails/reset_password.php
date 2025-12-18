@@ -183,15 +183,6 @@
                 </a>
             </div>
             
-            <div class="link-box">
-                <div class="link-box-label">
-                    Atau copy link ini:
-                </div>
-                <a href="<?= $resetLink ?>">
-                    <?= $resetLink ?>
-                </a>
-            </div>
-            
             <div class="warning-box">
                 <p>
                     ⏰ <strong>Link ini berlaku 24 jam.</strong> Jika tidak digunakan, silakan daftar ulang.

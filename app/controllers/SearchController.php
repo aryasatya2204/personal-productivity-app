@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../models/Todo.php';
-require_once __DIR__ . '/../models/Note.php';
+require_once __DIR__ . '/../Models/Todo.php';
+require_once __DIR__ . '/../Models/Note.php';
 
 class SearchController {
     

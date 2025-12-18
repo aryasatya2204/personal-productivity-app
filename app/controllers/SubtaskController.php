@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/Subtask.php';
+require_once __DIR__ . '/../Models/Subtask.php';
 
 class SubtaskController {
     private $db;

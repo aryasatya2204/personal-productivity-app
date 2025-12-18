@@ -1,6 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/User.php';
-require_once __DIR__ . '/../services/MailerService.php';
+require_once __DIR__ . '/../Models/User.php';
 use App\Services\MailerService;
 
 
@@ -48,6 +47,7 @@ class AuthController {
                     
                     // Simpan Token
                     $userModel->setActivationToken($data['email'], $token);
+                    
 
                     // Siapkan Email dengan Template Modern
                     $mailer = new MailerService();
@@ -380,7 +380,7 @@ class AuthController {
         unset($_SESSION['user_email']);
         session_destroy();
         
-        header('location: ./');
+        header('Location: ' . base_url('login'));
         exit;
     }
 
@@ -389,7 +389,7 @@ class AuthController {
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_avatar'] = $user['avatar'];
-        header('Location: /');
+        header('Location: ' . base_url('dashboard'));
       	exit;
     }
 

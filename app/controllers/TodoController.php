@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../models/Todo.php';
-require_once __DIR__ . '/../models/Tag.php'; 
-require_once __DIR__ . '/../models/ActivityLogger.php';
+require_once __DIR__ . '/../Models/Todo.php';
+require_once __DIR__ . '/../Models/Tag.php'; 
+require_once __DIR__ . '/../Models/ActivityLogger.php';
 
 class TodoController {
     

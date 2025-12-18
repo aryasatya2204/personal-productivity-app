@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../models/Todo.php';
-require_once __DIR__ . '/../models/Note.php';
-require_once __DIR__ . '/../models/ActivityLogger.php';
+require_once __DIR__ . '/../Models/Todo.php';
+require_once __DIR__ . '/../Models/Note.php';
+require_once __DIR__ . '/../Models/ActivityLogger.php';
 
 // Pastikan base_url() tersedia
 if (!function_exists('base_url')) {

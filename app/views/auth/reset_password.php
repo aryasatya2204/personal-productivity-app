@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set Password Baru - Productivity App</title>
     <link href="assets/css/output.css" rel="stylesheet">
+    <link href="<?= base_url('assets/css/output.css') ?>" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/favicon.png') ?>">
+    <link rel="apple-touch-icon" href="<?= base_url('assets/img/favicon.png') ?>">
+    
+    <style>
+        .swal2-container {
+            z-index: 99999 !important;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans antialiased text-gray-900">
 
@@ -24,7 +34,7 @@
                     <label for="password" class="block font-medium text-sm text-gray-700 mb-1">Password Baru</label>
                     <input type="password" name="password" id="password" required
                         class="block w-full rounded-lg border-gray-300 bg-gray-50 border px-4 py-3 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 transition-colors <?php echo (!empty($data['password_error'])) ? 'border-red-500' : ''; ?>"
-                        placeholder="Minimal 6 karakter">
+                        placeholder="Minimal 8 karakter">
                     <span class="text-xs text-red-500 mt-1"><?php echo $data['password_error'] ?? ''; ?></span>
                 </div>
 
@@ -42,6 +52,25 @@
             </form>
         </div>
     </div>
+
+    <?php if (!empty($data['password_error']) || !empty($data['confirm_password_error'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Reset Password',
+                html: `
+                    <?php if (!empty($data['password_error'])): echo '<div class="text-red-600 mb-2">'.htmlspecialchars($data['password_error']).'</div>'; endif; ?>
+                    <?php if (!empty($data['confirm_password_error'])): echo '<div class="text-red-600">'.htmlspecialchars($data['confirm_password_error']).'</div>'; endif; ?>
+                `,
+                confirmButtonColor: '#2563EB',
+                confirmButtonText: 'Coba Lagi'
+            });
+        });
+    </script>
+    <?php endif; ?>
+</body>
+</html>
 
 </body>
 </html>

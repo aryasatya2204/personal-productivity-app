@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProductivityApp - Kelola Hidup Lebih Baik</title>
     <link href="assets/css/output.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/favicon.png') ?>">
+    <link rel="apple-touch-icon" href="<?= base_url('assets/img/favicon.png') ?>">
     <style>
         html { scroll-behavior: smooth; }
         

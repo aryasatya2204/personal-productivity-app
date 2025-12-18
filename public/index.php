@@ -11,40 +11,51 @@ $dotenv->safeLoad();
 
 date_default_timezone_set('Asia/Jakarta');
 
+// --- LOGIKA PATH ADAPTIF (XAMPP & CLOUD) ---
+
+// 1. Ambil Request URI (misal: /project/public/login atau /login)
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-// Jika di hosting (DocumentRoot ke /public), path adalah request_uri itu sendiri
-$path = $request_uri;
+// 2. Ambil Folder Script (misal: /project/public atau /)
+$script_name = dirname($_SERVER['SCRIPT_NAME']);
+$script_name = str_replace('\\', '/', $script_name); // Normalisasi Windows
 
-// Jika masih ada /index.php di URL, kita bersihkan
-if (strpos($path, '/index.php') === 0) {
-    $path = substr($path, 10); // Menghapus '/index.php'
+// 3. Hapus Folder Script dari Request URI untuk dapatkan Path murni
+// Jika script_name adalah /, jangan di-replace karena bisa menghapus root slash
+if ($script_name !== '/') {
+    $path = str_replace($script_name, '', $request_uri);
+} else {
+    $path = $request_uri;
 }
 
-
-if (empty($path)) {
+// 4. Bersihkan sisa-sisa
+$path = '/' . ltrim($path, '/'); // Pastikan selalu diawali /
+if (strpos($path, '/index.php') === 0) {
+    $path = substr($path, 10); // Hapus /index.php jika ada
+}
+if (empty($path) || $path === '//') {
     $path = '/';
 }
 
-if ($path !== '/' && substr($path, -1) === '/') {
-    $redirect_url = rtrim($path, '/');
-    header("Location: $redirect_url", true, 301);
-    exit;
-}
 
+// --- FUNGSI BASE_URL ADAPTIF ---
 function base_url($uri = '')
 {
-    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' || 
-                 isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') 
-                 ? "https://" : "http://";
+    // Deteksi HTTPS (Support Dewa Cloud Proxy)
+    $isHttps = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') 
+            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+    $protocol = $isHttps ? "https://" : "http://";
     
     $host = $_SERVER['HTTP_HOST'];
     
-    // Cek apakah document root sudah di /public
-    $docRoot = $_SERVER['DOCUMENT_ROOT'];
-    $prefix = (strpos($docRoot, '/public') === false) ? '/public/' : '/';
+    // Deteksi Subfolder (PENTING UNTUK XAMPP)
+    $script_dir = dirname($_SERVER['SCRIPT_NAME']);
+    $script_dir = str_replace('\\', '/', $script_dir);
     
-    return $protocol . $host . $prefix . ltrim($uri, '/');
+    // Hapus trailing slash jika ada, kecuali root
+    $base_path = ($script_dir === '/') ? '' : $script_dir;
+
+    return $protocol . $host . $base_path . '/' . ltrim($uri, '/');
 }
 
 // Router Switch
@@ -286,6 +297,12 @@ switch ($path) {
         require_once __DIR__ . '/../app/controllers/ProfileController.php';
         $controller = new ProfileController();
         $controller->changePassword();
+        break;
+
+    case '/cron/reminders':
+        require_once __DIR__ . '/../app/controllers/ReminderController.php';
+        $controller = new ReminderController();
+        $controller->run();
         break;
 
     default:
