@@ -92,13 +92,13 @@ Pastikan environment memenuhi syarat berikut:
 ### 1️⃣ Clone Repository
 ```bash
 git clone https://github.com/aryasatya2204/personal-productivity-app.git
-cd personal-productivity-app
+cd personal-productivity-app ```
 ###2️⃣ Install Dependency PHP
-bash
+```bash
 Copy code
-composer install
+composer install```
 ###3️⃣ Setup Environment
-bash
+```bash
 Copy code
 cp .env.example .env
 Isi konfigurasi .env:
@@ -123,19 +123,19 @@ GOOGLE_REDIRECT_URI=http://localhost/personal-productivity-app/public/auth/googl
 SMTP_HOST=smtp.gmail.com
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_app_password
-SMTP_PORT=587
+SMTP_PORT=587```
 ###4️⃣ Setup Database
-sql
+```sql
 Copy code
 CREATE DATABASE productivity_app_db;
-Import tabel: users, todos, notes, habits, focus_logs, tags, dll.
+Import tabel: users, todos, notes, habits, focus_logs, tags, dll.```
 
 ###5️⃣ Build Frontend (Tailwind)
-bash
+```bash
 Copy code
 npm install
 npm run dev     # development
-npm run build   # production
+npm run build   # production```
 ###6️⃣ Jalankan Aplikasi
 XAMPP / Laragon
 
@@ -144,10 +144,10 @@ Copy code
 http://localhost/personal-productivity-app/public
 PHP Built-in Server
 
-bash
+```bash
 Copy code
 cd public
-php -S localhost:8000
+php -S localhost:8000```
 📂 Struktur Direktori
 plaintext
 Copy code
