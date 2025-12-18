@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lupa Password - Productivity App</title>
     <link href="<?= base_url('assets/css/output.css') ?>" rel="stylesheet">
+    <!-- LOAD SWEETALERT DI HEAD -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-50 font-sans antialiased text-gray-900">
 
@@ -22,26 +24,6 @@
                 <p class="text-gray-600 text-sm mb-6 text-center">
                     Masukkan alamat email yang terdaftar. Kami akan mengirimkan link untuk mereset password Anda.
                 </p>
-
-                <?php if (!empty($data['error'])): ?>
-                    <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-                        <div class="flex">
-                            <div class="ml-3">
-                                <p class="text-sm text-red-700"><?= $data['error']; ?></p>
-                            </div>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-                <?php if (!empty($data['success'])): ?>
-                    <div class="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded-md">
-                        <div class="flex">
-                            <div class="ml-3">
-                                <p class="text-sm text-green-700"><?= $data['success']; ?></p>
-                            </div>
-                        </div>
-                    </div>
-                <?php endif; ?>
 
                 <form action="<?= base_url('auth/forgot-password') ?>" method="POST">
                     <div class="mb-5">
@@ -65,6 +47,119 @@
             </div>
         </div>
     </div>
+
+    <!-- POPUP SUCCESS -->
+    <?php if (isset($_SESSION['reset_email_sent'])): ?>
+    <script>
+    (function() {
+        // Hapus session flag IMMEDIATELY untuk prevent re-trigger
+        <?php 
+            $emailAddress = $_SESSION['reset_email_address'] ?? '';
+            unset($_SESSION['reset_email_sent']); 
+            unset($_SESSION['reset_email_address']);
+        ?>
+
+        // Tunggu DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', showPopup);
+        } else {
+            showPopup();
+        }
+
+        function showPopup() {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Email Reset Password Terkirim!',
+                    html: `
+                        <p style="color: #4b5563; margin-bottom: 12px;">Link reset password telah dikirim ke:</p>
+                        <p style="font-weight: 600; color: #ec4899; margin-bottom: 16px;"><?= htmlspecialchars($emailAddress) ?></p>
+                        <p style="font-size: 14px; color: #6b7280;">Link berlaku 1 jam. Cek inbox atau folder spam.</p>
+                    `,
+                    confirmButtonText: 'Mengerti',
+                    confirmButtonColor: '#ec4899',
+                    allowOutsideClick: false,
+                    allowEscapeKey: true,
+                    customClass: {
+                        popup: 'bounce-popup'
+                    }
+                }).then(function() {
+                    // Optional: Clear URL parameters after close
+                    if (window.history.replaceState) {
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                });
+            } else {
+                console.error('SweetAlert not loaded');
+                alert('Email reset password telah dikirim ke <?= htmlspecialchars($emailAddress) ?>');
+            }
+        }
+    })();
+    </script>
+
+    <style>
+    @keyframes bounceIn {
+        0% {
+            transform: scale(0.3);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        70% {
+            transform: scale(0.9);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .bounce-popup {
+        animation: bounceIn 0.6s ease-out !important;
+    }
+    </style>
+    <?php endif; ?>
+
+    <!-- POPUP ERROR -->
+    <?php if (!empty($data['error'])): ?>
+    <script>
+    (function() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', showError);
+        } else {
+            showError();
+        }
+
+        function showError() {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Mengirim Email',
+                    text: '<?= addslashes($data['error']) ?>',
+                    confirmButtonText: 'Coba Lagi',
+                    confirmButtonColor: '#ef4444',
+                    customClass: {
+                        popup: 'shake-popup'
+                    }
+                });
+            }
+        }
+    })();
+    </script>
+
+    <style>
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+        20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+
+    .shake-popup {
+        animation: shake 0.5s ease-out !important;
+    }
+    </style>
+    <?php endif; ?>
 
 </body>
 </html>

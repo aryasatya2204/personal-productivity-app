@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk - Productivity App</title>
     <link href="assets/css/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-50 font-sans antialiased">
 
@@ -102,5 +104,44 @@
             }
         }
     </script>
+
+    <!-- Error Alert -->
+    <?php if (!empty($data['email_error']) || !empty($data['password_error'])): ?>
+    <script>
+    window.addEventListener('load', function() {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Gagal',
+                html: `
+                    <?php if (!empty($data['email_error'])): ?>
+                        <p style="color: #dc2626; font-size: 14px; margin-bottom: 8px;"><?= htmlspecialchars($data['email_error']) ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($data['password_error'])): ?>
+                        <p style="color: #dc2626; font-size: 14px;"><?= htmlspecialchars($data['password_error']) ?></p>
+                    <?php endif; ?>
+                `,
+                confirmButtonText: 'Coba Lagi',
+                confirmButtonColor: '#ef4444',
+                customClass: {
+                    popup: 'shake-popup'
+                }
+            });
+        }
+    });
+    </script>
+
+    <style>
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+        20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+    .shake-popup {
+        animation: shake 0.5s !important;
+    }
+    </style>
+    <?php endif; ?>
+
 </body>
 </html>

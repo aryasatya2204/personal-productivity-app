@@ -159,7 +159,7 @@ class AuthController {
                 $userModel->setResetToken($email, $token);
 
                 // Siapkan Email dengan Template Modern
-                $resetLink = base_url('/auth/reset?token=' . $token);
+                $resetLink = base_url('auth/reset?token=' . $token);
                 $mailer = new MailerService();
                 
                 // Load email template
@@ -170,10 +170,12 @@ class AuthController {
                 $subject = "🔐 Reset Password - Productivity App";
                 $mailer->sendEmail($email, 'User', $subject, $emailBody);
                 
-                // Set session untuk popup sukses
+                // PENTING: Set session DAN redirect
                 $_SESSION['reset_email_sent'] = true;
                 $_SESSION['reset_email_address'] = $email;
-                header('Location: /auth/forgot-password');
+                
+                // Redirect ke halaman yang sama untuk trigger popup
+                header('Location: ' . base_url('auth/forgot-password'));
                 exit;
 
             } catch (Exception $e) {
@@ -225,97 +227,152 @@ class AuthController {
     }
 
     public function google() {
-        // Ambil config dari .env
-        $clientId     = $_ENV['GOOGLE_CLIENT_ID'];
-        $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'];
-        // URL Callback harus SAMA PERSIS dengan yang didaftarkan di Console
-        $redirectUri = $_ENV['GOOGLE_REDIRECT_URI'] ?? base_url('/auth/google/callback');
+    // Pastikan session sudah dimulai
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
+    $clientId     = $_ENV['GOOGLE_CLIENT_ID'];
+    $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'];
+    
+    // PENTING: Gunakan URL langsung dari .env, JANGAN pakai base_url()
+    $redirectUri = $_ENV['GOOGLE_REDIRECT_URI'];
+
+    // Validasi config
+    if (empty($clientId) || empty($clientSecret) || empty($redirectUri)) {
+        die('Google OAuth configuration is incomplete. Please check your .env file.');
+    }
+
+    try {
         $provider = new \League\OAuth2\Client\Provider\Google([
             'clientId'     => $clientId,
             'clientSecret' => $clientSecret,
             'redirectUri'  => $redirectUri,
         ]);
 
-        // Dapatkan URL Login Google
         $authUrl = $provider->getAuthorizationUrl([
-            'scope' => ['email', 'profile'] // Kita butuh akses email & profil dasar
+            'scope' => ['email', 'profile'],
+            'access_type' => 'online', // Tidak perlu refresh token
+            'prompt' => 'select_account' // User bisa pilih akun
         ]);
 
-        // Simpan state untuk keamanan (CSRF Protection)
+        // Simpan state untuk CSRF protection
         $_SESSION['oauth2state'] = $provider->getState();
 
-        // Redirect user
         header('Location: ' . $authUrl);
         exit;
+        
+    } catch (\Exception $e) {
+        error_log('Google OAuth Init Error: ' . $e->getMessage());
+        die('Failed to initialize Google login: ' . $e->getMessage());
     }
+}
 
     // 2. Handle Callback dari Google
     public function googleCallback() {
-        $clientId     = $_ENV['GOOGLE_CLIENT_ID'];
-        $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'];
-        $redirectUri = $_ENV['GOOGLE_REDIRECT_URI'] ?? base_url('/auth/google/callback');
+    // Pastikan session aktif
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
+    // Cek error dari Google terlebih dahulu
+    if (isset($_GET['error'])) {
+        error_log('Google OAuth Error: ' . $_GET['error']);
+        die('Google login cancelled or failed: ' . htmlspecialchars($_GET['error']));
+    }
+
+    // Validasi parameter yang diperlukan
+    if (empty($_GET['code'])) {
+        die('Authorization code missing. Please try logging in again.');
+    }
+
+    if (empty($_GET['state'])) {
+        die('State parameter missing. Please try logging in again.');
+    }
+
+    // Validasi state untuk CSRF protection
+    if (!isset($_SESSION['oauth2state'])) {
+        die('Session expired or invalid. Please try logging in again.');
+    }
+
+    if ($_GET['state'] !== $_SESSION['oauth2state']) {
+        unset($_SESSION['oauth2state']);
+        die('Invalid state. CSRF protection failed. Please try logging in again.');
+    }
+
+    // State valid, hapus dari session
+    unset($_SESSION['oauth2state']);
+
+    $clientId     = $_ENV['GOOGLE_CLIENT_ID'];
+    $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'];
+    $redirectUri  = $_ENV['GOOGLE_REDIRECT_URI']; // JANGAN pakai fallback base_url()
+
+    try {
         $provider = new \League\OAuth2\Client\Provider\Google([
             'clientId'     => $clientId,
             'clientSecret' => $clientSecret,
             'redirectUri'  => $redirectUri,
         ]);
 
-        // Validasi State (Mencegah CSRF Attack)
-        if (empty($_GET['state']) || (isset($_SESSION['oauth2state']) && $_GET['state'] !== $_SESSION['oauth2state'])) {
-            unset($_SESSION['oauth2state']);
-            die('Invalid state. Silakan coba login lagi.');
+        // Tukar authorization code dengan access token
+        $token = $provider->getAccessToken('authorization_code', [
+            'code' => $_GET['code']
+        ]);
+
+        // Ambil data user dari Google
+        $googleUser = $provider->getResourceOwner($token);
+        
+        $gId     = $googleUser->getId();
+        $gEmail  = $googleUser->getEmail();
+        $gName   = $googleUser->getName();
+        $gAvatar = $googleUser->getAvatar();
+
+        // Validasi data yang diterima
+        if (empty($gId) || empty($gEmail)) {
+            throw new \Exception('Failed to get user information from Google');
         }
 
-        try {
-            // Tukar "Code" dengan "Access Token"
-            $token = $provider->getAccessToken('authorization_code', [
-                'code' => $_GET['code']
-            ]);
+        $userModel = new User();
+        
+        // Cek apakah user sudah pernah login dengan Google
+        $user = $userModel->findUserByGoogleId($gId);
 
-            // Ambil Data User dari Google
-            $googleUser = $provider->getResourceOwner($token);
+        if (!$user) {
+            // Cek apakah email sudah terdaftar
+            $existingUser = $userModel->findUserByEmail($gEmail);
             
-            $gId     = $googleUser->getId();
-            $gEmail  = $googleUser->getEmail();
-            $gName   = $googleUser->getName();
-            $gAvatar = $googleUser->getAvatar();
-
-            $userModel = new User();
-            
-            // Cek 1: Apakah user sudah pernah login pakai Google sebelumnya?
-            $user = $userModel->findUserByGoogleId($gId);
-
-            if (!$user) {
-                // Cek 2: Jika belum, apakah emailnya sudah terdaftar via register biasa?
-                $existingUser = $userModel->findUserByEmail($gEmail);
-                
-                if ($existingUser) {
-                    // LINK ACCOUNT: Gabungkan akun Google dengan akun lama
-                    $userModel->linkGoogleAccount($gEmail, $gId, $gAvatar);
-                    $user = $userModel->findUserByEmail($gEmail); // Refresh data
-                } else {
-                    // REGISTER BARU: Buat akun baru otomatis
-                    $newUser = [
-                        'name' => $gName,
-                        'email' => $gEmail,
-                        'google_id' => $gId,
-                        'avatar' => $gAvatar
-                    ];
-                    $userModel->registerViaGoogle($newUser);
-                    $user = $userModel->findUserByEmail($gEmail); // Ambil user yang baru dibuat
-                }
+            if ($existingUser) {
+                // Link akun Google ke akun existing
+                $userModel->linkGoogleAccount($gEmail, $gId, $gAvatar);
+                $user = $userModel->findUserByEmail($gEmail);
+            } else {
+                // Register user baru
+                $newUser = [
+                    'name' => $gName,
+                    'email' => $gEmail,
+                    'google_id' => $gId,
+                    'avatar' => $gAvatar
+                ];
+                $userModel->registerViaGoogle($newUser);
+                $user = $userModel->findUserByEmail($gEmail);
             }
-
-            // Login Sukses
-            $this->createUserSession($user);
-            exit;
-
-        } catch (\Exception $e) {
-            die('Gagal login dengan Google: ' . $e->getMessage());
         }
+
+        if (!$user) {
+            throw new \Exception('Failed to create or retrieve user account');
+        }
+
+        // Login sukses
+        $this->createUserSession($user);
+
+    } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+        error_log('Google OAuth API Error: ' . $e->getMessage());
+        die('Failed to authenticate with Google: ' . $e->getMessage());
+    } catch (\Exception $e) {
+        error_log('Google OAuth Error: ' . $e->getMessage());
+        die('An error occurred during Google login: ' . $e->getMessage());
     }
+}
 
     public function logout() {
         unset($_SESSION['user_id']);
