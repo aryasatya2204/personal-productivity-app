@@ -12,28 +12,39 @@ $dotenv->safeLoad();
 date_default_timezone_set('Asia/Jakarta');
 
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$script_name = dirname($_SERVER['SCRIPT_NAME']);
-$script_name = str_replace('\\', '/', $script_name);
 
-if (strpos($request_uri, $script_name) === 0) {
-    $path = substr($request_uri, strlen($script_name));
-} else {
-    $path = $request_uri;
-}
+// Jika di hosting (DocumentRoot ke /public), path adalah request_uri itu sendiri
+$path = $request_uri;
 
+// Jika masih ada /index.php di URL, kita bersihkan
 if (strpos($path, '/index.php') === 0) {
-    $path = str_replace('/index.php', '', $path);
+    $path = substr($path, 10); // Menghapus '/index.php'
 }
+
 
 if (empty($path)) {
     $path = '/';
 }
 
+if ($path !== '/' && substr($path, -1) === '/') {
+    $redirect_url = rtrim($path, '/');
+    header("Location: $redirect_url", true, 301);
+    exit;
+}
+
 function base_url($uri = '')
 {
-    $script_name = dirname($_SERVER['SCRIPT_NAME']);
-    $script_name = str_replace('\\', '/', $script_name);
-    return $script_name . '/' . ltrim($uri, '/');
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' || 
+                 isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') 
+                 ? "https://" : "http://";
+    
+    $host = $_SERVER['HTTP_HOST'];
+    
+    // Cek apakah document root sudah di /public
+    $docRoot = $_SERVER['DOCUMENT_ROOT'];
+    $prefix = (strpos($docRoot, '/public') === false) ? '/public/' : '/';
+    
+    return $protocol . $host . $prefix . ltrim($uri, '/');
 }
 
 // Router Switch
@@ -283,3 +294,4 @@ switch ($path) {
         echo "<small>System Path detected: " . htmlspecialchars($path) . "</small>";
         break;
 }
+

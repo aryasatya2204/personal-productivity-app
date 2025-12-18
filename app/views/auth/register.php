@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buat Akun - Productivity App</title>
-    <link href="<?= base_url('assets/css/output.css') ?>" rel="stylesheet">
+    <link href="assets/css/output.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-50 font-sans antialiased">
 
@@ -143,6 +144,28 @@
             }
         }
     </script>
+  
+  <?php if (isset($_SESSION['registration_pending'])): ?>
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Email Verifikasi Terkirim!',
+    html: `
+        <p class="text-gray-600 mb-3">Link verifikasi telah dikirim ke:</p>
+        <p class="font-semibold text-blue-600"><?= $_SESSION['registered_email'] ?></p>
+        <p class="text-sm text-gray-500 mt-4">Silakan cek inbox atau folder spam Anda.</p>
+    `,
+    confirmButtonText: 'Mengerti',
+    confirmButtonColor: '#2563eb',
+    allowOutsideClick: false,
+    allowEscapeKey: false
+});
+</script>
+<?php 
+    unset($_SESSION['registration_pending']); 
+    unset($_SESSION['registered_email']);
+endif; 
+?>
 
 </body>
 </html>

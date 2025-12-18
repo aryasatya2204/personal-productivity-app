@@ -3,93 +3,83 @@ require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../services/MailerService.php';
 use App\Services\MailerService;
 
-// Pastikan base_url() tersedia
-if (!function_exists('base_url')) {
-    function base_url($uri = '') {
-        $script_name = dirname($_SERVER['SCRIPT_NAME']);
-        $script_name = str_replace('\\', '/', $script_name);
-        return $script_name . '/' . ltrim($uri, '/');
-    }
-}
 
 class AuthController {
     
     public function register() {
-        $data = [
-            'name' => '',
-            'email' => '',
-            'password' => '',
-            'confirm_password' => '',
-            'name_error' => '',
-            'email_error' => '',
-            'password_error' => '',
-            'confirm_password_error' => ''
-        ];
+    $data = [
+        'name' => '',
+        'email' => '',
+        'password' => '',
+        'confirm_password' => '',
+        'name_error' => '',
+        'email_error' => '',
+        'password_error' => '',
+        'confirm_password_error' => ''
+    ];
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $_POST = filter_input_array(INPUT_POST, FILTER_DEFAULT); 
-        
-            $data['name'] = trim($_POST['name']);
-            $data['email'] = trim($_POST['email']);
-            $data['password'] = trim($_POST['password']);
-            $data['confirm_password'] = trim($_POST['confirm_password']);
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $_POST = filter_input_array(INPUT_POST, FILTER_DEFAULT); 
+    
+        $data['name'] = trim($_POST['name']);
+        $data['email'] = trim($_POST['email']);
+        $data['password'] = trim($_POST['password']);
+        $data['confirm_password'] = trim($_POST['confirm_password']);
 
-            // Validasi Input (Logika Lama)
-            if (empty($data['name'])) { $data['name_error'] = 'Nama wajib diisi'; }
-            if (empty($data['email'])) { $data['email_error'] = 'Email wajib diisi'; }
-            if (empty($data['password'])) { $data['password_error'] = 'Password wajib diisi'; }
-            if ($data['password'] != $data['confirm_password']) { $data['confirm_password_error'] = 'Konfirmasi password tidak cocok'; }
+        // Validasi Input
+        if (empty($data['name'])) { $data['name_error'] = 'Nama wajib diisi'; }
+        if (empty($data['email'])) { $data['email_error'] = 'Email wajib diisi'; }
+        if (empty($data['password'])) { $data['password_error'] = 'Password wajib diisi'; }
+        if ($data['password'] != $data['confirm_password']) { $data['confirm_password_error'] = 'Konfirmasi password tidak cocok'; }
 
-            $userModel = new User();
-            if ($userModel->findUserByEmail($data['email'])) {
-                $data['email_error'] = 'Email sudah terdaftar';
-            }
-
-            if (empty($data['name_error']) && empty($data['email_error']) && empty($data['password_error']) && empty($data['confirm_password_error'])) {
-                
-                // 1. Register User (is_verified masih 0)
-                if ($userModel->register($data)) { 
-                    
-                    // --- IMPLEMENTASI MAGIC LINK ---
-                    try {
-                        // Generate Token
-                        $token = bin2hex(random_bytes(32));
-                        
-                        // Simpan Token ke User yg baru dibuat (berdasarkan email)
-                        $userModel->setActivationToken($data['email'], $token);
-
-                        // Siapkan Email
-                        $mailer = new MailerService();
-                        $verifyLink = base_url('/auth/verify?token=' . $token); // Pastikan routing Anda mendukung query string ini
-                        
-                        $subject = "Verifikasi Akun Anda";
-                        $body = "
-                            <h3>Halo " . htmlspecialchars($data['name']) . "!</h3>
-                            <p>Terima kasih telah mendaftar. Langkah terakhir, klik tombol di bawah ini untuk mengaktifkan akun:</p>
-                            <a href='$verifyLink' style='background:#007bff; color:white; padding:10px 15px; text-decoration:none; border-radius:5px;'>Verifikasi Akun Saya</a>
-                            <br><br>
-                            <p>Atau copy link ini: $verifyLink</p>
-                        ";
-
-                        $mailer->sendEmail($data['email'], $data['name'], $subject, $body);
-
-                        // Redirect ke Login dengan pesan
-                        // Anda bisa membuat view khusus 'verify_sent.php' jika mau
-                        echo "<script>alert('Registrasi berhasil! Silakan cek email Anda untuk verifikasi.'); window.location.href='./login.php';</script>";
-                        exit;
-
-                    } catch (Exception $e) {
-                        die("Gagal mengirim email: " . $e->getMessage());
-                    }
-
-                } else {
-                    die('Terjadi kesalahan database.');
-                }
-            }
+        $userModel = new User();
+        if ($userModel->findUserByEmail($data['email'])) {
+            $data['email_error'] = 'Email sudah terdaftar';
         }
 
-        $this->view('auth/register', $data);
+        if (empty($data['name_error']) && empty($data['email_error']) && empty($data['password_error']) && empty($data['confirm_password_error'])) {
+            
+            // Register User (is_verified masih 0)
+            if ($userModel->register($data)) { 
+                
+                try {
+                    // Generate Token
+                    $token = bin2hex(random_bytes(32));
+                    
+                    // Simpan Token
+                    $userModel->setActivationToken($data['email'], $token);
+
+                    // Siapkan Email dengan Template Modern
+                    $mailer = new MailerService();
+                    $verifyLink = base_url('/auth/verify?token=' . $token);
+                    
+                    // Load email template
+                    ob_start();
+                    $userName = htmlspecialchars($data['name']);
+                    require __DIR__ . '/../views/emails/verification.php';
+                    $emailBody = ob_get_clean();
+
+                    $subject = "🚀 Verifikasi Akun Anda - Productivity App";
+                    $mailer->sendEmail($data['email'], $data['name'], $subject, $emailBody);
+
+                    // Set session untuk popup
+                    $_SESSION['registration_pending'] = true;
+                    $_SESSION['registered_email'] = $data['email'];
+                    header('Location: /register');
+                    exit;
+
+                } catch (Exception $e) {
+                    die("Gagal mengirim email: " . $e->getMessage());
+                }
+
+            } else {
+                die('Terjadi kesalahan database.');
+            }
+        }
     }
+
+    $this->view('auth/register', $data);
+}
 
     public function verify() {
         // Ambil token dari URL
@@ -107,8 +97,8 @@ class AuthController {
             $userModel->activateUser($user['id']);
             
             // Auto Login (Magic)
-            $this->createUserSession($user);
-            exit;
+             $this->createUserSession($user);
+        	 exit;
         } else {
             die("Link verifikasi salah atau sudah kadaluarsa.");
         }
@@ -155,32 +145,47 @@ class AuthController {
         $this->view('auth/login', $data);
     }
 
-    public function forgotPassword() {
-        $data = ['email' => '', 'error' => '', 'success' => ''];
+   public function forgotPassword() {
+    $data = ['email' => '', 'error' => '', 'success' => ''];
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $email = trim($_POST['email']);
-            $userModel = new User();
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $email = trim($_POST['email']);
+        $userModel = new User();
 
-            if ($userModel->findUserByEmail($email)) {
+        if ($userModel->findUserByEmail($email)) {
+            try {
+                // Generate Token
                 $token = bin2hex(random_bytes(32));
                 $userModel->setResetToken($email, $token);
 
+                // Siapkan Email dengan Template Modern
                 $resetLink = base_url('/auth/reset?token=' . $token);
                 $mailer = new MailerService();
                 
-                $mailer->sendEmail($email, 'User', 'Reset Password', 
-                    "Klik link ini untuk reset password: <a href='$resetLink'>Reset Password</a>");
-                
-                $data['success'] = 'Link reset password telah dikirim ke email Anda.';
-            } else {
-                $data['error'] = 'Email tidak terdaftar.';
-            }
-        }
-        // Pastikan Anda membuat file view: app/views/auth/forgot_password.php
-        $this->view('auth/forgot_password', $data);
-    }
+                // Load email template
+                ob_start();
+                require __DIR__ . '/../views/emails/reset_password.php';
+                $emailBody = ob_get_clean();
 
+                $subject = "🔐 Reset Password - Productivity App";
+                $mailer->sendEmail($email, 'User', $subject, $emailBody);
+                
+                // Set session untuk popup sukses
+                $_SESSION['reset_email_sent'] = true;
+                $_SESSION['reset_email_address'] = $email;
+                header('Location: /auth/forgot-password');
+                exit;
+
+            } catch (Exception $e) {
+                $data['error'] = 'Gagal mengirim email: ' . $e->getMessage();
+            }
+        } else {
+            $data['error'] = 'Email tidak terdaftar.';
+        }
+    }
+    
+    $this->view('auth/forgot_password', $data);
+}
     // --- FITUR BARU: RESET PASSWORD FORM ---
     public function reset() {
         $token = $_GET['token'] ?? '';
@@ -224,7 +229,7 @@ class AuthController {
         $clientId     = $_ENV['GOOGLE_CLIENT_ID'];
         $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'];
         // URL Callback harus SAMA PERSIS dengan yang didaftarkan di Console
-        $redirectUri  = base_url('/auth/google/callback'); 
+        $redirectUri = $_ENV['GOOGLE_REDIRECT_URI'] ?? base_url('/auth/google/callback');
 
         $provider = new \League\OAuth2\Client\Provider\Google([
             'clientId'     => $clientId,
@@ -249,7 +254,7 @@ class AuthController {
     public function googleCallback() {
         $clientId     = $_ENV['GOOGLE_CLIENT_ID'];
         $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'];
-        $redirectUri  = base_url('/auth/google/callback');
+        $redirectUri = $_ENV['GOOGLE_REDIRECT_URI'] ?? base_url('/auth/google/callback');
 
         $provider = new \League\OAuth2\Client\Provider\Google([
             'clientId'     => $clientId,
@@ -327,7 +332,8 @@ class AuthController {
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_avatar'] = $user['avatar'];
-        header('location: ./');
+        header('Location: /');
+      	exit;
     }
 
     // Helper untuk memanggil view

@@ -1,10 +1,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
     
-    # Jangan proses jika request adalah file fisik (gambar, css, js)
+    # Jika yang diminta bukan file fisik atau folder fisik
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     
-    # Arahkan semua request lain ke index.php
-    RewriteRule ^(.*)$ index.php [QSA,L]
+    # Arahkan ke index.php
+    RewriteRule ^(.*)$ index.php [L,QSA]
 </IfModule>
