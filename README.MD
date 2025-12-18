@@ -93,11 +93,11 @@ Pastikan environment memenuhi syarat berikut:
 ```bash
 git clone https://github.com/aryasatya2204/personal-productivity-app.git
 cd personal-productivity-app
-2️⃣ Install Dependency PHP
+###2️⃣ Install Dependency PHP
 bash
 Copy code
 composer install
-3️⃣ Setup Environment
+###3️⃣ Setup Environment
 bash
 Copy code
 cp .env.example .env
@@ -124,19 +124,19 @@ SMTP_HOST=smtp.gmail.com
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_app_password
 SMTP_PORT=587
-4️⃣ Setup Database
+###4️⃣ Setup Database
 sql
 Copy code
 CREATE DATABASE productivity_app_db;
 Import tabel: users, todos, notes, habits, focus_logs, tags, dll.
 
-5️⃣ Build Frontend (Tailwind)
+###5️⃣ Build Frontend (Tailwind)
 bash
 Copy code
 npm install
 npm run dev     # development
 npm run build   # production
-6️⃣ Jalankan Aplikasi
+###6️⃣ Jalankan Aplikasi
 XAMPP / Laragon
 
 ruby
