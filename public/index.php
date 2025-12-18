@@ -63,7 +63,7 @@ switch ($path) {
     case '/':
     case '/index.php':
         if (isset($_SESSION['user_id'])) {
-            require_once __DIR__ . '/../app/controllers/HomeController.php';
+            require_once __DIR__ . '/../app/Controllers/HomeController.php';
             $controller = new HomeController();
             $controller->index();
         } else {
@@ -72,235 +72,235 @@ switch ($path) {
         break;
 
     case '/login':
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        require_once __DIR__ . '/../app/Controllers/AuthController.php';
         $controller = new AuthController();
         $controller->login();
         break;
 
     case '/logout':
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        require_once __DIR__ . '/../app/Controllers/AuthController.php';
         $controller = new AuthController();
         $controller->logout();
         break;
 
     case '/auth/verify':
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        require_once __DIR__ . '/../app/Controllers/AuthController.php';
         $controller = new AuthController();
         $controller->verify();
         break;
 
     case '/auth/forgot-password': 
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        require_once __DIR__ . '/../app/Controllers/AuthController.php';
         $controller = new AuthController();
         $controller->forgotPassword();
         break;
 
     case '/auth/reset': 
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        require_once __DIR__ . '/../app/Controllers/AuthController.php';
         $controller = new AuthController();
         $controller->reset();
         break;
 
     case '/register':
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        require_once __DIR__ . '/../app/Controllers/AuthController.php';
         $controller = new AuthController();
         $controller->register();
         break;
 
     case '/auth/google':
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        require_once __DIR__ . '/../app/Controllers/AuthController.php';
         $controller = new AuthController();
         $controller->google();
         break;
 
     case '/auth/google/callback':
-        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        require_once __DIR__ . '/../app/Controllers/AuthController.php';
         $controller = new AuthController();
         $controller->googleCallback();
         break;
 
     case '/todos':
-        require_once __DIR__ . '/../app/controllers/TodoController.php';
+        require_once __DIR__ . '/../app/Controllers/TodoController.php';
         $controller = new TodoController();
         $controller->index();
         break;
 
     case '/todos/store':
-        require_once __DIR__ . '/../app/controllers/TodoController.php';
+        require_once __DIR__ . '/../app/Controllers/TodoController.php';
         $controller = new TodoController();
         $controller->store();
         break;
 
     case '/todos/toggle':
-        require_once __DIR__ . '/../app/controllers/TodoController.php';
+        require_once __DIR__ . '/../app/Controllers/TodoController.php';
         $controller = new TodoController();
         $controller->toggle();
         break;
 
     case '/todos/delete':
-        require_once __DIR__ . '/../app/controllers/TodoController.php';
+        require_once __DIR__ . '/../app/Controllers/TodoController.php';
         $controller = new TodoController();
         $controller->delete();
         break;
 
     case '/todos/update':
-        require_once __DIR__ . '/../app/controllers/TodoController.php';
+        require_once __DIR__ . '/../app/Controllers/TodoController.php';
         $controller = new TodoController();
         $controller->update();
         break;
 
     case '/notes':
-        require_once __DIR__ . '/../app/controllers/NoteController.php';
+        require_once __DIR__ . '/../app/Controllers/NoteController.php';
         $controller = new NoteController();
         $controller->index();
         break;
 
     case '/notes/store':
-        require_once __DIR__ . '/../app/controllers/NoteController.php';
+        require_once __DIR__ . '/../app/Controllers/NoteController.php';
         $controller = new NoteController();
         $controller->store();
         break;
 
     case '/notes/update':
-        require_once __DIR__ . '/../app/controllers/NoteController.php';
+        require_once __DIR__ . '/../app/Controllers/NoteController.php';
         $controller = new NoteController();
         $controller->update();
         break;
 
     case '/notes/folders/store':
-        require_once __DIR__ . '/../app/controllers/NoteController.php';
+        require_once __DIR__ . '/../app/Controllers/NoteController.php';
         $controller = new NoteController();
         $controller->storeFolder();
         break;
 
     case '/notes/folders/delete':
-        require_once __DIR__ . '/../app/controllers/NoteController.php';
+        require_once __DIR__ . '/../app/Controllers/NoteController.php';
         $controller = new NoteController();
         $controller->deleteFolder();
         break;
 
     case '/notes/delete':
-        require_once __DIR__ . '/../app/controllers/NoteController.php';
+        require_once __DIR__ . '/../app/Controllers/NoteController.php';
         $controller = new NoteController();
         $controller->delete();
         break;
 
     case '/notes/pin':
-        require_once __DIR__ . '/../app/controllers/NoteController.php';
+        require_once __DIR__ . '/../app/Controllers/NoteController.php';
         $controller = new NoteController();
         $controller->pin();
         break;
 
     case '/subtasks/list':
-        require_once __DIR__ . '/../app/controllers/SubtaskController.php';
+        require_once __DIR__ . '/../app/Controllers/SubtaskController.php';
         $controller = new SubtaskController();
         $controller->index();
         break;
 
     case '/subtasks/store':
-        require_once __DIR__ . '/../app/controllers/SubtaskController.php';
+        require_once __DIR__ . '/../app/Controllers/SubtaskController.php';
         $controller = new SubtaskController();
         $controller->store();
         break;
 
     case '/subtasks/toggle':
-        require_once __DIR__ . '/../app/controllers/SubtaskController.php';
+        require_once __DIR__ . '/../app/Controllers/SubtaskController.php';
         $controller = new SubtaskController();
         $controller->toggle();
         break;
 
     case '/subtasks/delete':
-        require_once __DIR__ . '/../app/controllers/SubtaskController.php';
+        require_once __DIR__ . '/../app/Controllers/SubtaskController.php';
         $controller = new SubtaskController();
         $controller->delete();
         break;
 
     case '/habits':
-        require_once __DIR__ . '/../app/controllers/HabitController.php';
+        require_once __DIR__ . '/../app/Controllers/HabitController.php';
         $controller = new HabitController();
         $controller->index();
         break;
 
     case '/habits/store':
-        require_once __DIR__ . '/../app/controllers/HabitController.php';
+        require_once __DIR__ . '/../app/Controllers/HabitController.php';
         $controller = new HabitController();
         $controller->store();
         break;
 
     case '/habits/delete':
-        require_once __DIR__ . '/../app/controllers/HabitController.php';
+        require_once __DIR__ . '/../app/Controllers/HabitController.php';
         $controller = new HabitController();
         $controller->delete();
         break;
         
     case '/habits/toggle':
-        require_once __DIR__ . '/../app/controllers/HabitController.php';
+        require_once __DIR__ . '/../app/Controllers/HabitController.php';
         $controller = new HabitController();
         $controller->toggle();
         break;
 
     case '/focus':
-        require_once __DIR__ . '/../app/controllers/FocusController.php';
+        require_once __DIR__ . '/../app/Controllers/FocusController.php';
         $controller = new FocusController();
         $controller->index();
         break;
 
     case '/focus/store':
-        require_once __DIR__ . '/../app/controllers/FocusController.php';
+        require_once __DIR__ . '/../app/Controllers/FocusController.php';
         $controller = new FocusController();
         $controller->store();
         break;
 
     case '/tags/list':
-        require_once __DIR__ . '/../app/controllers/TagController.php';
+        require_once __DIR__ . '/../app/Controllers/TagController.php';
         $controller = new TagController();
         $controller->list();
         break;
 
     case '/tags/store':
-        require_once __DIR__ . '/../app/controllers/TagController.php';
+        require_once __DIR__ . '/../app/Controllers/TagController.php';
         $controller = new TagController();
         $controller->store();
         break;
 
     case '/tags/delete':
-        require_once __DIR__ . '/../app/controllers/TagController.php';
+        require_once __DIR__ . '/../app/Controllers/TagController.php';
         $controller = new TagController();
         $controller->delete();
         break;
     
     case '/search':
-        require_once __DIR__ . '/../app/controllers/SearchController.php';
+        require_once __DIR__ . '/../app/Controllers/SearchController.php';
         $controller = new SearchController();
         $controller->index();
         break;
 
     case '/profile':
-        require_once __DIR__ . '/../app/controllers/ProfileController.php';
+        require_once __DIR__ . '/../app/Controllers/ProfileController.php';
         $controller = new ProfileController();
         $controller->index();
         break;
     
     case '/profile/update':
-        require_once __DIR__ . '/../app/controllers/ProfileController.php';
+        require_once __DIR__ . '/../app/Controllers/ProfileController.php';
         $controller = new ProfileController();
         $controller->update();
         break;
 
     case '/profile/avatar':
-        require_once __DIR__ . '/../app/controllers/ProfileController.php';
+        require_once __DIR__ . '/../app/Controllers/ProfileController.php';
         $controller = new ProfileController();
         $controller->uploadAvatar();
         break;
 
     case '/profile/password':
-        require_once __DIR__ . '/../app/controllers/ProfileController.php';
+        require_once __DIR__ . '/../app/Controllers/ProfileController.php';
         $controller = new ProfileController();
         $controller->changePassword();
         break;
 
     case '/cron/reminders':
-        require_once __DIR__ . '/../app/controllers/ReminderController.php';
+        require_once __DIR__ . '/../app/Controllers/ReminderController.php';
         $controller = new ReminderController();
         $controller->run();
         break;
