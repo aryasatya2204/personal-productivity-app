@@ -10,11 +10,22 @@
     <link rel="apple-touch-icon" href="<?= base_url('assets/img/favicon.png') ?>">
     
     <style>
-        /* Fix Z-Index agar Alert tidak stuck/unclickable */
-        .swal2-container {
-            z-index: 99999 !important;
+        .swal2-container { z-index: 99999 !important; }
+        .swal2-popup.modern-alert {
+            border-radius: 20px !important;
+            padding: 1.5rem !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1) !important;
         }
-        
+        .swal2-title.modern-title {
+            font-size: 1.25rem !important;
+            font-weight: 700 !important;
+            color: #1f2937 !important;
+        }
+        .modern-confirm-btn {
+            padding: 0.7rem 2rem !important;
+            font-weight: 600 !important;
+            border-radius: 10px !important;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans antialiased">
@@ -122,30 +133,6 @@
         }
     </script>
 
-    <style>
-    .swal2-container { z-index: 99999 !important; }
-
-    /* Modern Alert Styling */
-    .swal2-popup.modern-alert {
-        border-radius: 20px !important;
-        padding: 1.5rem !important;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1) !important;
-        font-family: ui-sans-serif, system-ui, -apple-system, sans-serif !important;
-    }
-    .swal2-title.modern-title {
-        font-size: 1.25rem !important;
-        font-weight: 700 !important;
-        color: #1f2937 !important;
-        padding-top: 1rem !important;
-    }
-    .modern-confirm-btn {
-        padding: 0.7rem 2rem !important;
-        font-weight: 600 !important;
-        border-radius: 10px !important;
-        margin-top: 1rem !important;
-    }
-</style>
-
 <?php if (!empty($data['name_error']) || !empty($data['email_error']) || !empty($data['password_error']) || !empty($data['confirm_password_error'])): ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -154,7 +141,7 @@
             html: `
                 <div class="space-y-2 mt-2">
                     <?php 
-                    $errors = array_filter([$data['name_error'], $data['email_error'], $data['password_error'], $data['confirm_password_error']]);
+                    $errors = array_filter([$data['name_error'] ?? '', $data['email_error'] ?? '', $data['password_error'] ?? '', $data['confirm_password_error'] ?? '']);
                     foreach($errors as $error): 
                     ?>
                         <div class="flex items-center gap-2 text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-100 text-left">
@@ -175,6 +162,27 @@
             confirmButtonText: 'Perbaiki Data'
         });
     });
+</script>
+<?php endif; ?>
+
+<?php if (!empty($data['success']) || isset($_SESSION['register_success'])): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            title: 'Registrasi Berhasil!',
+            text: 'Notifikasi telah dikirim, cek email anda.',
+            icon: 'success',
+            iconColor: '#2563EB',
+            buttonsStyling: false,
+            customClass: {
+                popup: 'modern-alert',
+                title: 'modern-title',
+                confirmButton: 'modern-confirm-btn bg-blue-600 hover:bg-blue-700 text-white transition-all'
+            },
+            confirmButtonText: 'Oke'
+        });
+    });
+    <?php unset($_SESSION['register_success']); ?>
 </script>
 <?php endif; ?>
 

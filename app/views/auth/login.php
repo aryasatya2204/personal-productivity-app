@@ -10,6 +10,9 @@
     <link rel="apple-touch-icon" href="<?= base_url('assets/img/favicon.png') ?>">
     <style>
         .swal2-container { z-index: 99999 !important; }
+        .swal2-popup.modern-alert { border-radius: 20px !important; padding: 1.5rem !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1) !important; }
+        .swal2-title.modern-title { font-size: 1.5rem !important; font-weight: 700 !important; color: #1f2937 !important; }
+        .modern-confirm-btn { padding: 0.7rem 2rem !important; font-weight: 600 !important; border-radius: 10px !important; }
     </style>
 </head>
 <body class="bg-gray-50 font-sans antialiased">
@@ -96,47 +99,64 @@
         }
     </script>
 
-    <style>
-    .swal2-container { z-index: 99999 !important; }
-    .swal2-popup.modern-alert { border-radius: 20px !important; padding: 1.5rem !important; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1) !important; }
-    .swal2-title.modern-title { font-size: 1.25rem !important; font-weight: 700 !important; color: #1f2937 !important; }
-    .modern-confirm-btn { padding: 0.7rem 2rem !important; font-weight: 600 !important; border-radius: 10px !important; }
-</style>
-
-<?php if (!empty($data['email_error']) || !empty($data['password_error'])): ?>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        Swal.fire({
-            title: 'Gagal Masuk',
-            html: `
-                <div class="space-y-2 mt-2">
-                    <?php if (!empty($data['email_error'])): ?>
-                        <div class="flex items-center gap-2 text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-100 text-left">
-                            <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
-                            <span class="text-xs font-medium"><?= htmlspecialchars($data['email_error']) ?></span>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php if (!empty($data['password_error'])): ?>
-                        <div class="flex items-center gap-2 text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-100 text-left">
-                            <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
-                            <span class="text-xs font-medium"><?= htmlspecialchars($data['password_error']) ?></span>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            `,
-            icon: 'error',
-            iconColor: '#ef4444',
-            buttonsStyling: false,
-            customClass: {
-                popup: 'modern-alert animate__animated animate__shakeX',
-                title: 'modern-title',
-                confirmButton: 'modern-confirm-btn bg-blue-600 hover:bg-blue-700 text-white transition-all'
-            },
-            confirmButtonText: 'Coba Lagi'
+    <?php if (!empty($data['email_error']) || !empty($data['password_error'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                title: 'Gagal Masuk',
+                html: `
+                    <div class="space-y-2 mt-2">
+                        <?php if (!empty($data['email_error'])): ?>
+                            <div class="flex items-center gap-2 text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-100 text-left">
+                                <span class="text-xs font-medium"><?= htmlspecialchars($data['email_error']) ?></span>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($data['password_error'])): ?>
+                            <div class="flex items-center gap-2 text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-100 text-left">
+                                <span class="text-xs font-medium"><?= htmlspecialchars($data['password_error']) ?></span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                `,
+                icon: 'error',
+                iconColor: '#ef4444',
+                buttonsStyling: false,
+                customClass: {
+                    popup: 'modern-alert animate__animated animate__shakeX',
+                    title: 'modern-title',
+                    confirmButton: 'modern-confirm-btn bg-blue-600 hover:bg-blue-700 text-white transition-all'
+                },
+                confirmButtonText: 'Coba Lagi'
+            });
         });
-    });
-</script>
-<?php endif; ?>
+    </script>
+    <?php endif; ?>
+
+    <?php if (isset($data['login_success']) || isset($_SESSION['login_success'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                title: 'Selamat Datang!',
+                text: 'Senang melihat Anda kembali.',
+                icon: 'success',
+                iconColor: '#2563EB',
+                buttonsStyling: false,
+                allowOutsideClick: false, // Memaksa user klik tombol untuk redirect
+                customClass: {
+                    popup: 'modern-alert',
+                    title: 'modern-title',
+                    confirmButton: 'modern-confirm-btn bg-blue-600 hover:bg-blue-700 text-white transition-all'
+                },
+                confirmButtonText: 'Lanjut ke Dashboard'
+            }).then((result) => {
+                // Redirect ke dashboard saat ditutup/dikonfirmasi
+                window.location.href = '<?= base_url('dashboard') ?>';
+            });
+        });
+        <?php unset($_SESSION['login_success']); // Hapus session agar tidak muncul terus ?>
+    </script>
+    <?php endif; ?>
+
 </body>
 </html>

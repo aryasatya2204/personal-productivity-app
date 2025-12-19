@@ -63,10 +63,10 @@ class AuthController {
                     $mailer->sendEmail($data['email'], $data['name'], $subject, $emailBody);
 
                     // Set session untuk popup
-                    $_SESSION['registration_pending'] = true;
-                    $_SESSION['registered_email'] = $data['email'];
-                    header('Location: /register');
-                    exit;
+                    $_SESSION['register_success'] = true; // UBAH INI
+$_SESSION['registered_email'] = $data['email'];
+header('Location: ' . base_url('register'));
+exit;
 
                 } catch (Exception $e) {
                     die("Gagal mengirim email: " . $e->getMessage());
@@ -130,11 +130,19 @@ class AuthController {
                         $data['email_error'] = 'Akun belum diverifikasi. Cek email Anda.';
                     } else {
                         if (password_verify($data['password'], $user['password'])) {
-                            $this->createUserSession($user);
-                            exit;
-                        } else {
-                            $data['password_error'] = 'Password salah';
-                        }
+    // 1. Set Session Manual (jangan pakai function helper yang ada redirect-nya)
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['user_name'] = $user['name'];
+    $_SESSION['user_email'] = $user['email'];
+    $_SESSION['user_avatar'] = $user['avatar'] ?? null;
+
+    // 2. Beri tanda sukses agar View menampilkan SweetAlert
+    $data['login_success'] = true;
+    
+    // 3. Jangan redirect disini. Biarkan script lanjut ke bawah untuk memuat view login lagi
+} else {
+    $data['password_error'] = 'Password salah';
+}
                     }
                 } else {
                     $data['email_error'] = 'Email tidak ditemukan';
@@ -214,12 +222,16 @@ class AuthController {
             if ($data['password'] != $data['confirm_password']) { $data['confirm_password_error'] = 'Password tidak sama'; }
 
             if (empty($data['password_error']) && empty($data['confirm_password_error'])) {
-                $hashed = password_hash($data['password'], PASSWORD_DEFAULT);
-                $userModel->updatePasswordNew($user['id'], $hashed);
-                
-                echo "<script>alert('Password berhasil diubah! Silakan login.'); window.location.href='./login.php';</script>";
-                exit;
-            }
+    $hashed = password_hash($data['password'], PASSWORD_DEFAULT);
+    $userModel->updatePasswordNew($user['id'], $hashed);
+    
+    // Set tanda sukses
+    $data['reset_success'] = true;
+    
+    // Load view kembali dengan data sukses
+    $this->view('auth/reset_password', $data);
+    return; // Stop eksekusi
+}
         }
 
         // Pastikan Anda membuat file view: app/views/auth/reset_password.php
@@ -363,7 +375,20 @@ class AuthController {
         }
 
         // Login sukses
-        $this->createUserSession($user);
+        // Login sukses
+// 1. Set Session
+$_SESSION['user_id'] = $user['id'];
+$_SESSION['user_name'] = $user['name'];
+$_SESSION['user_email'] = $user['email'];
+$_SESSION['user_avatar'] = $user['avatar'];
+
+// 2. Set Flag Sukses untuk alert
+$_SESSION['login_success'] = true; 
+
+// 3. Redirect ke halaman LOGIN (bukan dashboard)
+// Agar user melihat alert "Selamat Datang" dulu di halaman login
+header('Location: ' . base_url('login'));
+exit;
 
     } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
         error_log('Google OAuth API Error: ' . $e->getMessage());
@@ -380,7 +405,7 @@ class AuthController {
         unset($_SESSION['user_email']);
         session_destroy();
         
-        header('Location: ' . base_url('login'));
+        header('Location: /login');
         exit;
     }
 
@@ -389,7 +414,7 @@ class AuthController {
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_avatar'] = $user['avatar'];
-        header('Location: ' . base_url('dashboard'));
+        header('Location: ' . base_url('/'));
       	exit;
     }
 

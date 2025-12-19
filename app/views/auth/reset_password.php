@@ -4,15 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set Password Baru - Productivity App</title>
-    <link href="assets/css/output.css" rel="stylesheet">
     <link href="<?= base_url('assets/css/output.css') ?>" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" type="image/png" href="<?= base_url('assets/img/favicon.png') ?>">
     <link rel="apple-touch-icon" href="<?= base_url('assets/img/favicon.png') ?>">
     
     <style>
-        .swal2-container {
-            z-index: 99999 !important;
+        .swal2-container { z-index: 99999 !important; }
+        .swal2-popup.modern-alert {
+            border-radius: 20px !important;
+            padding: 2rem !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1) !important;
+        }
+        .swal2-title.modern-title {
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+            color: #1f2937 !important;
+        }
+        .modern-confirm-btn {
+            padding: 0.8rem 2rem !important;
+            font-weight: 600 !important;
+            border-radius: 12px !important;
         }
     </style>
 </head>
@@ -64,13 +76,39 @@
                     <?php if (!empty($data['confirm_password_error'])): echo '<div class="text-red-600">'.htmlspecialchars($data['confirm_password_error']).'</div>'; endif; ?>
                 `,
                 confirmButtonColor: '#2563EB',
-                confirmButtonText: 'Coba Lagi'
+                confirmButtonText: 'Coba Lagi',
+                customClass: {
+                    popup: 'modern-alert',
+                    title: 'modern-title',
+                    confirmButton: 'modern-confirm-btn'
+                }
             });
         });
     </script>
     <?php endif; ?>
-</body>
-</html>
 
+    <?php if (isset($data['reset_success']) || isset($_SESSION['reset_success'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Password anda berhasil di reset, silahkan login kembali',
+                confirmButtonColor: '#2563EB',
+                confirmButtonText: 'Ke Halaman Login',
+                buttonsStyling: false,
+                customClass: {
+                    popup: 'modern-alert',
+                    title: 'modern-title',
+                    confirmButton: 'modern-confirm-btn bg-blue-600 hover:bg-blue-700 text-white transition-all'
+                }
+            }).then((result) => {
+                // Redirect ke login saat ditutup
+                window.location.href = '<?= base_url('login') ?>';
+            });
+        });
+        <?php unset($_SESSION['reset_success']); ?>
+    </script>
+    <?php endif; ?>
 </body>
 </html>

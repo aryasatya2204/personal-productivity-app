@@ -62,6 +62,7 @@ function base_url($uri = '')
 switch ($path) {
     case '/':
     case '/index.php':
+    case '/dashboard':
         if (isset($_SESSION['user_id'])) {
             require_once __DIR__ . '/../app/Controllers/HomeController.php';
             $controller = new HomeController();
