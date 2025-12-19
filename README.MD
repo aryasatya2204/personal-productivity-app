@@ -79,32 +79,38 @@
 
 Pastikan environment memenuhi syarat berikut:
 
-- PHP ≥ 8.1  
+- **PHP** ≥ 8.1  
   Ekstensi: `pdo_mysql`, `curl`, `mbstring`
-- Composer (global)
-- Node.js & NPM
-- MySQL ≥ 5.7
+- **Composer** (global)
+- **Node.js** & **NPM**
+- **MySQL** ≥ 5.7
 
 ---
 
 ## 🚀 Instalasi & Konfigurasi
 
 ### 1️⃣ Clone Repository
+
 ```bash
 git clone https://github.com/aryasatya2204/personal-productivity-app.git
 cd personal-productivity-app
-2️⃣ Install Dependency PHP
-bash
-Copy code
-composer install
-3️⃣ Setup Environment
-bash
-Copy code
-cp .env.example .env
-Isi konfigurasi .env:
+```
 
-env
-Copy code
+### 2️⃣ Install Dependency PHP
+
+```bash
+composer install
+```
+
+### 3️⃣ Setup Environment
+
+```bash
+cp .env.example .env
+```
+
+Isi konfigurasi `.env`:
+
+```env
 # Database
 DB_HOST=localhost
 DB_NAME=productivity_app_db
@@ -124,33 +130,44 @@ SMTP_HOST=smtp.gmail.com
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_app_password
 SMTP_PORT=587
-4️⃣ Setup Database
-sql
-Copy code
-CREATE DATABASE productivity_app_db;
-Import tabel: users, todos, notes, habits, focus_logs, tags, dll.
+```
 
-5️⃣ Build Frontend (Tailwind)
-bash
-Copy code
+### 4️⃣ Setup Database
+
+```sql
+CREATE DATABASE productivity_app_db;
+```
+
+Import tabel: `users`, `todos`, `notes`, `habits`, `focus_logs`, `tags`, dll.
+
+### 5️⃣ Build Frontend (Tailwind)
+
+```bash
 npm install
 npm run dev     # development
 npm run build   # production
-6️⃣ Jalankan Aplikasi
-XAMPP / Laragon
+```
 
-ruby
-Copy code
+### 6️⃣ Jalankan Aplikasi
+
+**XAMPP / Laragon:**
+
+```
 http://localhost/personal-productivity-app/public
-PHP Built-in Server
+```
 
-bash
-Copy code
+**PHP Built-in Server:**
+
+```bash
 cd public
 php -S localhost:8000
-📂 Struktur Direktori
-plaintext
-Copy code
+```
+
+---
+
+## 📂 Struktur Direktori
+
+```
 personal-productivity-app/
 ├── app/
 │   ├── controllers/
@@ -171,29 +188,40 @@ personal-productivity-app/
 ├── composer.json
 ├── package.json
 └── README.md
-👨‍💻 Panduan Pengembangan
-Menambah Controller
-Buat file di app/controllers/NamaController.php
+```
 
-Nama class harus sama dengan nama file
+---
 
-Daftarkan route di public/index.php
+## 👨‍💻 Panduan Pengembangan
 
-Workflow Tailwind
-❌ Jangan edit public/assets/css/output.css
+### Menambah Controller
 
-✅ Edit:
+1. Buat file di `app/controllers/NamaController.php`
+2. Nama class harus sama dengan nama file
+3. Daftarkan route di `public/index.php`
 
-app/views/
+### Workflow Tailwind
 
-src/input.css
+❌ **Jangan edit** `public/assets/css/output.css`
 
-Jalankan:
+✅ **Edit:**
+- `app/views/`
+- `src/input.css`
 
-bash
-Copy code
+**Jalankan:**
+
+```bash
 npm run dev
-📄 Lisensi
-Project ini menggunakan MIT License
+```
 
-<p align="center"> Dibuat dengan ❤️ dan ☕ oleh <b>Arya Satya</b> </p> ```
+---
+
+## 📄 Lisensi
+
+Project ini menggunakan **MIT License**
+
+---
+
+<p align="center">
+  Dibuat dengan ❤️ dan ☕ oleh <b>Arya Satya</b>
+</p>
