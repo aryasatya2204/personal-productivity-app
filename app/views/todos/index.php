@@ -139,22 +139,25 @@
                             Label (Tag)
                         </div>
                         <div class="flex flex-wrap gap-2" id="tagsSelectionContainer">
-                            <?php if(!empty($data['available_tags'])): foreach($data['available_tags'] as $tag): ?>
-                                <label class="cursor-pointer select-none">
-                                    <input type="checkbox" name="tags[]" value="<?= $tag['id'] ?>" class="tag-checkbox hidden peer">
-                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold border transition-all 
-                                        bg-gray-50 text-gray-600 border-gray-200 opacity-60
-                                        peer-checked:opacity-100 peer-checked:shadow-sm peer-checked:text-white"
-                                        style="--tag-color: <?= $tag['color_hex'] ?>"
-                                        onclick="this.style.backgroundColor = this.previousElementSibling.checked ? '' : 'var(--tag-color)'; this.style.borderColor = this.previousElementSibling.checked ? '' : 'var(--tag-color)';"
-                                    >
-                                        <?= htmlspecialchars($tag['name']) ?>
-                                    </span>
-                                </label>
-                            <?php endforeach; else: ?>
-                                <p class="text-xs text-gray-400 italic">Belum ada label. Buat di menu sidebar.</p>
-                            <?php endif; ?>
-                        </div>
+    <?php if(!empty($data['available_tags'])): foreach($data['available_tags'] as $tag): ?>
+        <label class="cursor-pointer select-none group">
+            <input type="checkbox" 
+                   name="tags[]" 
+                   value="<?= $tag['id'] ?>" 
+                   class="tag-checkbox hidden peer"
+                   onchange="updateTagVisual(this)">
+            
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-bold border transition-all 
+                         bg-gray-50 text-gray-600 border-gray-200 opacity-60
+                         group-hover:opacity-100 peer-checked:opacity-100 peer-checked:text-white peer-checked:shadow-sm"
+                  data-color="<?= $tag['color_hex'] ?>"
+                  style="border-color: transparent;"> <?= htmlspecialchars($tag['name']) ?>
+            </span>
+        </label>
+    <?php endforeach; else: ?>
+        <p class="text-xs text-gray-400 italic">Belum ada label.</p>
+    <?php endif; ?>
+</div>
                     </div>
 
                     <div class="flex items-center gap-4 text-sm">
@@ -227,10 +230,9 @@
         document.body.style.overflow = 'hidden';
         
         document.querySelectorAll('.tag-checkbox').forEach(cb => {
-            cb.checked = false;
-            cb.nextElementSibling.style.backgroundColor = '';
-            cb.nextElementSibling.style.borderColor = '';
-        });
+        cb.checked = false;
+        updateTagVisual(cb); 
+    });
 
         if (todo) {
             isEditMode = false; 
@@ -244,8 +246,8 @@
             document.getElementById('task_id').value = '';
             document.getElementById('task_due_date').valueAsDate = new Date();
             document.getElementById('checklistSection').classList.add('hidden');
-            document.getElementById('createModeWarning').classList.remove('hidden');
-            document.getElementById('deleteBtnContainer').innerHTML = '';
+        document.getElementById('createModeWarning').classList.remove('hidden');
+        document.getElementById('deleteBtnContainer').innerHTML = '';
             showEditMode(); 
         }
     }
@@ -257,18 +259,16 @@
         document.getElementById('task_due_date').value = todo.due_date;
 
         if(todo.tags_info) {
-            const tags = todo.tags_info.split('||');
-            tags.forEach(t => {
-                const [id, name, color] = t.split('~');
-                const checkbox = document.querySelector(`.tag-checkbox[value="${id}"]`);
-                if(checkbox) {
-                    checkbox.checked = true;
-                    const span = checkbox.nextElementSibling;
-                    span.style.backgroundColor = color;
-                    span.style.borderColor = color;
-                }
-            });
-        }
+        const tags = todo.tags_info.split('||');
+        tags.forEach(t => {
+            const [id, name, color] = t.split('~'); 
+            const checkbox = document.querySelector(`.tag-checkbox[value="${id}"]`);
+            if(checkbox) {
+                checkbox.checked = true;
+                updateTagVisual(checkbox); 
+            }
+        });
+    }
 
         document.getElementById('checklistSection').classList.remove('hidden');
         document.getElementById('createModeWarning').classList.add('hidden');
@@ -355,6 +355,21 @@
             }
         });
     }
+  
+  function updateTagVisual(checkbox) {
+    const span = checkbox.nextElementSibling;
+    const color = span.getAttribute('data-color');
+
+    if (checkbox.checked) {
+        // Jika dicentang: Pasang warna background dan border
+        span.style.backgroundColor = color;
+        span.style.borderColor = color;
+    } else {
+        // Jika tidak dicentang: Hapus warna (kembali ke style default CSS)
+        span.style.backgroundColor = '';
+        span.style.borderColor = ''; 
+    }
+}
 
     function loadSubtasks(todoId) {
         const list = document.getElementById('subtaskList');
